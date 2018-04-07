@@ -4,33 +4,9 @@ import (
 	"testing"
 )
 
-var trie = New()
-
-func TestInsert(t *testing.T) {
-	trie.insert("testing")
+func TestFindExisting(t *testing.T) {
+	trie := New()
 	trie.insert("test")
-	trie.insert("tested")
-	trie.insert("dominique")
-	trie.insert("partial")
-}
-
-func TestFindTesting(t *testing.T) {
-	node, ok := trie.find("testing")
-
-	if node.value != 'g' {
-		t.Errorf("Expected value to be g, but it was %s instead.", string(node.value))
-	}
-
-	if node.terminal != true {
-		t.Errorf("Expected value to be true, but it was %t instead.", node.terminal)
-	}
-
-	if !ok {
-		t.Errorf("Expected ok to be true, but it was %t instead.", ok)
-	}
-}
-
-func TestFindTest(t *testing.T) {
 	node, ok := trie.find("test")
 
 	if node.value != 't' {
@@ -46,55 +22,9 @@ func TestFindTest(t *testing.T) {
 	}
 }
 
-func TestFindTested(t *testing.T) {
-	node, ok := trie.find("tested")
-
-	if node.value != 'd' {
-		t.Errorf("Expected value to be d, but it was %s instead.", string(node.value))
-	}
-
-	if node.terminal != true {
-		t.Errorf("Expected value to be true, but it was %t instead.", node.terminal)
-	}
-
-	if !ok {
-		t.Errorf("Expected ok to be true, but it was %t instead.", ok)
-	}
-}
-
-func TestFindDominique(t *testing.T) {
-	node, ok := trie.find("dominique")
-
-	if node.value != 'e' {
-		t.Errorf("Expected value to be e, but it was %s instead.", string(node.value))
-	}
-
-	if node.terminal != true {
-		t.Errorf("Expected value to be true, but it was %t instead.", node.terminal)
-	}
-
-	if !ok {
-		t.Errorf("Expected ok to be true, but it was %t instead.", ok)
-	}
-}
-
 func TestFindPartial(t *testing.T) {
-	node, ok := trie.find("partial")
-
-	if node.value != 'l' {
-		t.Errorf("Expected value to be l, but it was %s instead.", string(node.value))
-	}
-
-	if node.terminal != true {
-		t.Errorf("Expected value to be true, but it was %t instead.", node.terminal)
-	}
-
-	if !ok {
-		t.Errorf("Expected ok to be true, but it was %t instead.", ok)
-	}
-}
-
-func TestFindPart(t *testing.T) {
+	trie := New()
+	trie.insert("partial")
 	node, ok := trie.find("part")
 
 	if node.value != 't' {
@@ -111,6 +41,8 @@ func TestFindPart(t *testing.T) {
 }
 
 func TestFindNonExisting(t *testing.T) {
+	trie := New()
+	trie.insert("dominique")
 	node, ok := trie.find("non_existing")
 
 	if node != nil {
@@ -119,5 +51,76 @@ func TestFindNonExisting(t *testing.T) {
 
 	if ok {
 		t.Errorf("Expected ok to be false, but it was %t instead.", ok)
+	}
+}
+
+func BenchmarkInsert(b *testing.B) {
+	trie := New()
+
+	for n := 0; n < b.N; n++ {
+		trie.insert("word")
+	}
+}
+
+func BenchmarkInsertSimilar(b *testing.B) {
+	trie := New()
+
+	for n := 0; n < b.N; n++ {
+		trie.insert("testing")
+		trie.insert("tested")
+	}
+}
+
+func BenchmarkInsertDifferent(b *testing.B) {
+	trie := New()
+
+	for n := 0; n < b.N; n++ {
+		trie.insert("patricia")
+		trie.insert("dominique")
+	}
+}
+
+func BenchmarkFindExisting(b *testing.B) {
+	trie := New()
+	trie.insert("testing")
+	trie.insert("test")
+	trie.insert("tested")
+	trie.insert("word")
+	trie.insert("partial")
+	trie.insert("dominique")
+	trie.insert("patricia")
+
+	for n := 0; n < b.N; n++ {
+		_, _ = trie.find("dominique")
+	}
+}
+
+func BenchmarkFindPartial(b *testing.B) {
+	trie := New()
+	trie.insert("testing")
+	trie.insert("test")
+	trie.insert("tested")
+	trie.insert("word")
+	trie.insert("partial")
+	trie.insert("dominique")
+	trie.insert("patricia")
+
+	for n := 0; n < b.N; n++ {
+		_, _ = trie.find("part")
+	}
+}
+
+func BenchmarkFindNonExisting(b *testing.B) {
+	trie := New()
+	trie.insert("testing")
+	trie.insert("test")
+	trie.insert("tested")
+	trie.insert("word")
+	trie.insert("partial")
+	trie.insert("dominique")
+	trie.insert("patricia")
+
+	for n := 0; n < b.N; n++ {
+		_, _ = trie.find("non_existing")
 	}
 }
